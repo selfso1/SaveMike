@@ -71,7 +71,11 @@ home_page = login_form.submit
 	comment3 = options3[rand(0..(length3-1))]
 	taskcomment2_field.value = comment3
 	submitpage = isp_form.submit submit_button
-
-	p "#{date_arg} processed"
-        #sleep 10
+#p submitpage
+        if submitpage.uri.to_s == "https://secure.therapservices.net/ma/common/done"
+	    p "#{date_arg} processed"
+	else
+	    p "#{date_arg} SOMETHING WENT WRONG!"
+	end
+        #sleep 5
 #end
