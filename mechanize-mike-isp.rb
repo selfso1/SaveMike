@@ -46,14 +46,17 @@ home_page = login_form.submit
 	comment_field = isp_form.field_with(name: 'ispData.comments')
 
 	location_field.value = "House"
-
-	file = File.open("mikes-routine.txt")
+	
+	routine_file = File.expand_path("../mikes-routine.txt", __FILE__)
+	file = File.open(routine_file, "rb")
 	contents = file.read
 
-	file2 = File.open("Activities1.txt")
+	act1_file = File.expand_path("../Activities1.txt", __FILE__)
+	file2 = File.open(act1_file, "rb")
 	contents2 = file2.read
 
-	file3 = File.open("Activities2.txt")
+	act2_file = File.expand_path("../Activities2.txt", __FILE__)
+	file3 = File.open(act2_file, "rb")
 	contents3 = file3.read
 
 	options = contents.split("//")
