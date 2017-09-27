@@ -18,19 +18,20 @@ email_field = login_form.field_with(name: "loginName")
 password_field = login_form.field_with(name: "password")
 provider_field = login_form.field_with(name: "providerCode")
 
-email_field.value = ''
-password_field.value = ''
+email_field.value = 'rfinnigan'
+password_field.value = 'Siftit123'
 provider_field.value = 'CCI-CO'
 cookie_field.value = true
 
 home_page = login_form.submit
 
-#(Date.new(2015, 12, 17)..Date.new(2016, 07, 16)).each do |date|
-	date = Time.now
+#(Date.new(2017, 9, 13)..Date.new(2017, 9, 26)).each do |date|
+	date = Time.now 
 	date_arg = date.strftime("%m/%d/%Y")
 	#next if ["05/18/2016", "05/16/2016", "05/01/2016", "03/13/2016", "02/03/2016", "02/02/2016", "01/08/2016", "12/07/2015", "11/28/2015", "11/29/2015", "11/30/2015"].include? date_arg
 	#isp_choose  = agent.get "#@website/ma/isp/individualListData?pgmId=98291&backLink=%2fnewfpage%2fswitchFirstPage&backType=1"
-	isp_choose  = agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-EAL4QAEVV7677&backLink=%2Fnewfpage%2FswitchFirstPage&backType=2"
+	#isp_choose  = agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-EAL4QAEVV7677&backLink=%2Fnewfpage%2FswitchFirstPage&backType=2"
+	isp_choose  = agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-FAQ4V2RVXPKT3&backLink=ispDataList"
 	date_form = isp_choose.form
 	date_field = date_form.field_with(name: 'ispData.dataCollectionDate')
 	date_field.value = date_arg #'01/08/2016'
@@ -75,7 +76,7 @@ home_page = login_form.submit
 	taskcomment2_field.value = comment3
 	submitpage = isp_form.submit submit_button
 #p submitpage
-        if submitpage.uri.to_s == "https://secure.therapservices.net/ma/common/done"
+        if submitpage.uri.to_s.include?("https://secure.therapservices.net/ma/common/done")
 	    p "#{date_arg} processed"
 	else
 	    p "#{date_arg} SOMETHING WENT WRONG!"
