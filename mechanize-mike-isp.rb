@@ -25,7 +25,7 @@ cookie_field.value = true
 
 home_page = login_form.submit
 
-#(Date.new(2017, 9, 13)..Date.new(2017, 9, 26)).each do |date|
+#(Date.new(2018, 2, 14)..Date.new(2018, 3, 27)).each do |date|
 	date = Time.now 
 	date_arg = date.strftime("%m/%d/%Y")
 	#next if ["05/18/2016", "05/16/2016", "05/01/2016", "03/13/2016", "02/03/2016", "02/02/2016", "01/08/2016", "12/07/2015", "11/28/2015", "11/29/2015", "11/30/2015"].include? date_arg
@@ -39,10 +39,11 @@ home_page = login_form.submit
 	isp_page = date_form.submit date_button
 	isp_form = isp_page.form
 
+
 	location_field = isp_form.field_with(name: 'ispData.location')
 	taskcomment1_field = isp_form.field_with(name: 'ispData.taskScores[0].comments')
 	taskcomment2_field = isp_form.field_with(name: 'ispData.taskScores[1].comments')
-	submit_button = isp_form.button_with(name: 'saveButton')
+	submit_button = isp_form.button_with(name: '_action_save')
 
 	comment_field = isp_form.field_with(name: 'ispData.comments')
 
