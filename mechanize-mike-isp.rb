@@ -77,10 +77,11 @@ home_page = login_form.submit
 	taskcomment2_field.value = comment3
 	submitpage = isp_form.submit submit_button
 #p submitpage
-        if submitpage.uri.to_s.include?("https://secure.therapservices.net/ma/common/done")
-	    p "#{date_arg} processed"
+  if submitpage.uri.to_s.include?("https://secure.therapservices.net/ma/common/done")
+	  p "#{date_arg} processed"
 	else
-	    p "#{date_arg} SOMETHING WENT WRONG!"
+	  p "#{date_arg} SOMETHING WENT WRONG!"
 	end
-        #sleep 5
+	
+	#sleep 5
 #end
