@@ -5,7 +5,7 @@ require 'time_handler'
 require 'pry'
 
 
-Shoes.app(title: "Mike Wears Shoes", width: 454, height: 550) do
+Shoes.app(title: "Mike Wears Shoes", width: 454, height: 650) do
   
   extend TimeHandler
   
@@ -14,9 +14,9 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 550) do
   background lime..mediumseagreen
 
   stack margin: 10 do
-    # p home_page
-    stack do
-      @title = title "Let's Mechanize Mike!", left: 50
+    
+    @title = stack do
+      title "Let's Mechanize Mike!", left: 50
     end
     stack do
       @img = image "./assets/mike-mechanized-md.jpg", left: 100      
@@ -48,19 +48,36 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 550) do
       # Log Mike in
       home_page = mike.login @user.text, @password.text, @provider.text      
       
-      if home_page.form(action: "/auth/login") || home_page.title.include?("Login Failed")        
+      if mike.is_unsuccessful_login? home_page
         # Bad login Try Again
-        @content1.prepend { para "Bad Credentials Try again" }
-      
-      elsif home_page.form(name: "splash") || home_page.title.include?("Splash Message")
-        # Splash page message needs to be displayed and submitted
-        splash_msg_page = mike.get_splash_message home_page
-        binding.pry
+        @content1.prepend { para "Bad Credentials Try again" }             
 
       else 
         # Success, time to get down
-        @title  = "Mike Is Ready To Be Automated"
+        @title.clear do 
+          stack do 
+            title "Ready To Automate", left: 30 
+          end
+        end
+
         @content1.remove
+        
+        # Splash page message needs to be displayed and submitted
+        if mike.is_splash_page? home_page
+          splash_msg_page = mike.get_splash_message home_page
+          
+          @contentpost = stack margin: 5 do 
+            stack height: "100px", scroll: true do 
+              para splash_msg_page.at_css("#message").text
+            end
+            @post_button = button "Got it", width: 80, height: 35
+          end 
+          @post_button.click do
+            @contentpost.remove
+            home_page_new = mike.splash_page_submit home_page            
+          end
+        end 
+
         @content2 = stack margin: 50 do
           flow do
             para "Start Year: "
@@ -83,9 +100,19 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 550) do
           stack do
             button "Run Dates", left: 200 do 
               if !@start_year.text || !@start_month.text || !@start_day.text || !@end_year.text || !@end_month.text || !@end_day.text
-                alert "Please select proper values"
+                alert "Please select values for all the form items. "
               else
-                alert @start_year.text + " - " + @end_year.text
+                date_hash = {
+                  start_year: @start_year.text.to_i,
+                  start_month: @start_month.text.to_i,
+                  start_day: @start_day.text.to_i,
+                  end_year: @end_year.text.to_i,
+                  end_month: @end_month.text.to_i,
+                  end_day: @end_day.text.to_i
+                }
+                submit_page = mike.iterate_dates date_hash
+                
+                @content2.prepend { "Yep yep, \n #{mike.msg}" }
               end
             end
           end  

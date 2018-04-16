@@ -6,10 +6,13 @@ require 'pry'
 
 class MechanizeMike 
 
+  attr_accessor :msg
+  
   def initialize 
     @website = 'https://secure.therapservices.net'
     @agent = Mechanize.new
-    @agent.log = Logger.new "mechanize.log"
+    # @agent.log = Logger.new "mechanize.log"
+    @msg = ""
   end
 
   def default_user
@@ -47,14 +50,13 @@ class MechanizeMike
     cookie_field.value = true
     
     home_page = login_form.submit
-    # binding.pry
     home_page
   end
   
   # 1st page of isp requires user to select date to submit
   # @return main isp_page
   def isp_date_page_submit date = nil
-    date ||= Time.now
+    date = date ? date : Time.now
     date_arg = date.strftime("%m/%d/%Y")
     #next if ["05/18/2016", "05/16/2016", "05/01/2016", "03/13/2016", "02/03/2016", "02/02/2016", "01/08/2016", "12/07/2015", "11/28/2015", "11/29/2015", "11/30/2015"].include? date_arg
     #isp_choose  = agent.get "#@website/ma/isp/individualListData?pgmId=98291&backLink=%2fnewfpage%2fswitchFirstPage&backType=1"
@@ -69,11 +71,12 @@ class MechanizeMike
     
     isp_page = date_form.submit date_button
     isp_page
+    
   end
 
   # 2nd page of isp form
   # @return success page
-  def isp_form_page_submit isp_page
+  def isp_form_page_submit isp_page, date
     isp_form = isp_page.form
 
     location_field = isp_form.field_with(name: 'ispData.location')
@@ -91,28 +94,53 @@ class MechanizeMike
 
     submitpage = isp_form.submit submit_button
   
+    date = date ? date : Time.now
+    date_arg = date.strftime("%m/%d/%Y")
     if submitpage.uri.to_s.include?("https://secure.therapservices.net/ma/common/done")
-      p "#{date_arg} processed"
+      @msg << "#{date_arg} processed. "
     else
-      p "#{date_arg} SOMETHING WENT WRONG!"
+      @msg << "#{date_arg} SOMETHING WENT WRONG! "
     end
 
     submitpage
+
   end
 
   def splash_page_submit home_page
-    form.checkbox_with(name: 'markedRead')
+    form = home_page.form(name: "splash")
+    marked_read_field = form.checkbox_with(name: 'markedRead')
+    marked_read_field.value = "checked"
+    form.field_with(name: "actionButton").value = "firstPage"
+    dashboard_page = form.submit
+    dashboard_page
+
   end
 
   def get_splash_message home_page
     form = home_page.form(name: "splash")
-    currentMessageId = form.field_with(name: 'currentMessageId').value
-    splash_msg_page = @agent.get "#@website/ma/splash/messageView?messageId=#{currentMessageId}"
+    current_message_id = form.field_with(name: 'currentMessageId').value
+    splash_msg_page = @agent.get "#@website/ma/splash/messageView?messageId=#{current_message_id}"
     splash_msg_page
+
+  end
+
+  def iterate_dates date_vals = {}
+    start_year = date_vals.fetch(:start_year) { Time.now.year }
+    start_month = date_vals.fetch(:start_month) { Time.now.month }
+    start_day = date_vals.fetch(:start_day) { Time.now.day }
+    end_year = date_vals.fetch(:end_year) { Time.now.year }
+    end_month = date_vals.fetch(:end_month) { Time.now.month }
+    end_day = date_vals.fetch(:end_day) { Time.now.day }
+
+    (Date.new(start_year.to_i, start_month, start_day)..Date.new(end_year, end_month, end_day)).each do |date|
+      isp_page = isp_date_page_submit date      
+      success_page = isp_form_page_submit isp_page, date
+    end
+
   end
 
   def get_file_val file_type
-    file_url = "../"
+    file_url = "../../"
 
     case file_type
     when "activity1"
@@ -130,19 +158,15 @@ class MechanizeMike
     length = options.count
     file_val = options[rand(0..(length-1))]
     file_val
+
   end
 
-  def iterate_dates date_vals = {}
-    start_year = date_vals.fetch(:start_year) {}
-    start_month = date_vals.fetch(:start_month) {}
-    start_day = date_vals.fetch(:start_day) {}
-    end_year = date_vals.fetch(:end_year) {}
-    end_month = date_vals.fetch(:end_month) {}
-    end_day = date_vals.fetch(:end_day) {}
-
-    Date.new(start_year, start_month, start_day)..Date.new(end_year, end_month, end_month).each do |date|
-      isp_date_page_submit date
-    end
+  def is_unsuccessful_login? home_page
+    home_page.form(action: "/auth/login") || home_page.title.include?("Login Failed")
+  end
+  
+  def is_splash_page? home_page
+    home_page.form(name: "splash") || home_page.title.include?("Splash Message")
   end
 
 end
