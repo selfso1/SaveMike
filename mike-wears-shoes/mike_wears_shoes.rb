@@ -1,67 +1,105 @@
 
 require 'mechanize_mike'
+require 'time_handler'
+# TODO remove pry after development
+require 'pry'
 
-mike = MechanizeMike.new
-# home_page = mike.login
 
-Shoes.app(title: "Mike Wears Shoes", width: 450) do
+Shoes.app(title: "Mike Wears Shoes", width: 454, height: 550) do
+  
+  extend TimeHandler
+  
+  mike = MechanizeMike.new
+
   background lime..mediumseagreen
 
   stack margin: 10 do
     # p home_page
     stack do
-      title "Let's Mechanize Mike!", left: 50
+      @title = title "Let's Mechanize Mike!", left: 50
     end
     stack do
-      @img = image "./assets/mike-mechanized.jpg", left: 80
-    end
-
-    now = Time.now
-    current_year = now.year
-    current_month = now.month
-    current_day = now.day
-    month_array = [
-      current_month - 12, current_month - 11, current_month - 10, current_month - 9, current_month - 8, current_month - 7, 
-      current_month - 6 , current_month - 5, current_month - 4, current_month - 3, current_month - 2, current_month - 1, current_month
-    ]
+      @img = image "./assets/mike-mechanized-md.jpg", left: 100      
+    end        
     
-    day_array = [
-      current_day - 31, current_day - 30, current_day - 29, current_day - 28, current_day - 27, current_day - 26, current_day - 25, 
-      current_day - 24, current_day - 23, current_day - 22, current_day - 21, current_day - 20, current_day - 19, current_day - 18, 
-      current_day - 17, current_day - 16, current_day - 15, current_day - 14, current_day - 13, current_day - 12, current_day - 11,
-      current_day - 10, current_day - 9, current_day - 8, current_day - 7, current_day - 6, current_day - 5, current_day - 4, 
-      current_day - 3, current_day - 2, current_day - 1, current_day
-    ]
-    stack margin: 50 do
-      flow do
-        para "Start Year: "
-        @start_year = list_box items: [current_year - 1, current_year], width: 70
-        @start_year.choose(current_year)
-        para " Month: "
-        @start_month = list_box items: month_array, width: 50
-        para " Day: "
-        @start_day = list_box items: day_array, width: 50
+    @content1 = stack left: 100 do
+      stack do
+        para "Login"
+        @user = edit_line 
+        @user.text = mike.default_user
+      end
+      stack do
+        para "Password"
+        @password = edit_line 
+        @password.text = mike.default_password
+      end
+      stack do
+        para "Provider"
+        @provider = edit_line 
+        @provider.text = mike.default_provider
+      end
+      stack do
+        @login_btn = button "Login", width: 100, height: 35
       end
 
-      flow do
-        para "End Year: "
-        @end_year = list_box items: [current_year - 1, current_year], width: 70
-        
-        para " Month: "
-        @end_month = list_box items: month_array, width: 50
-        para " Day: "
-        @end_day = list_box items: day_array, width: 50
-      end  
+    end
+    
+    @login_btn.click do
+      # Log Mike in
+      home_page = mike.login @user.text, @password.text, @provider.text      
       
-      stack margin: 10 do
-        button "Run Dates" do 
+      if home_page.form(action: "/auth/login") || home_page.title.include?("Login Failed")        
+        # Bad login Try Again
+        @content1.prepend { para "Bad Credentials Try again" }
+      
+      elsif home_page.form(name: "splash") || home_page.title.include?("Splash Message")
+        # Splash page message needs to be displayed and submitted
+        splash_msg_page = mike.get_splash_message home_page
+        binding.pry
 
-          alert @start_year.text + " - " + @end_year.text
+      else 
+        # Success, time to get down
+        @title  = "Mike Is Ready To Be Automated"
+        @content1.remove
+        @content2 = stack margin: 50 do
+          flow do
+            para "Start Year: "
+            @start_year = list_box items: get_year_array, width: 70
+            para " Month: "
+            @start_month = list_box items: get_month_array, width: 50
+            para " Day: "
+            @start_day = list_box items: get_day_array, width: 50
+          end
+    
+          flow do
+            para " End Year: "
+            @end_year = list_box items: get_year_array, width: 70        
+            para " Month: "
+            @end_month = list_box items: get_month_array, width: 50
+            para " Day: "
+            @end_day = list_box items: get_day_array, width: 50
+          end  
+          
+          stack do
+            button "Run Dates", left: 200 do 
+              if !@start_year.text || !@start_month.text || !@start_day.text || !@end_year.text || !@end_month.text || !@end_day.text
+                alert "Please select proper values"
+              else
+                alert @start_year.text + " - " + @end_year.text
+              end
+            end
+          end  
+          
         end
-      end    
-    end    
+      end   
+    end  
     
   end
+
+  def alert_screen
+
+  end
+  
 end
 
 

@@ -12,13 +12,25 @@ class MechanizeMike
     @agent.log = Logger.new "mechanize.log"
   end
 
+  def default_user
+    'rfinnigan'
+  end
+
+  def default_password
+    'Siftit123'
+  end
+  
+  def default_provider
+    'CCI-CO'
+  end
+
   # login first ask questions later
   # TODO validate if there is a splash page and submit answer
   # @return home_page
   def login email_val = nil, password_val = nil , provider = nil
-    email_val = email_val ? email_val : 'rfinnigan'
-    password = password_val ? password_val : 'Siftit123'
-    provider = provider ? provider : 'CCI-CO'
+    email_val = email_val ? email_val : default_user
+    password = password_val ? password_val : default_password
+    provider = provider ? provider : default_provider
 
     login_page  = @agent.get "#@website/auth/login"
 
@@ -86,6 +98,17 @@ class MechanizeMike
     end
 
     submitpage
+  end
+
+  def splash_page_submit home_page
+    form.checkbox_with(name: 'markedRead')
+  end
+
+  def get_splash_message home_page
+    form = home_page.form(name: "splash")
+    currentMessageId = form.field_with(name: 'currentMessageId').value
+    splash_msg_page = @agent.get "#@website/ma/splash/messageView?messageId=#{currentMessageId}"
+    splash_msg_page
   end
 
   def get_file_val file_type
