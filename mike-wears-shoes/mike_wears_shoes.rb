@@ -56,7 +56,7 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 650) do
         # Success, time to get down
         @title.clear do 
           stack do 
-            title "Ready To Automate", left: 30 
+            title "Ready To Automate", left: 55 
           end
         end
 
@@ -112,12 +112,12 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 650) do
                 }
                 submit_page = mike.iterate_dates date_hash
                 
-                @content2.prepend { "Yep yep, \n #{mike.msg}" }
+                @content2.prepend { para "Yep yep, \n #{mike.msg}" }
               end
             end
           end  
-          
         end
+        
       end   
     end  
     

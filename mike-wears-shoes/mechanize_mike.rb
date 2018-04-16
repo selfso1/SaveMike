@@ -7,7 +7,7 @@ require 'pry'
 class MechanizeMike 
 
   attr_accessor :msg
-  
+
   def initialize 
     @website = 'https://secure.therapservices.net'
     @agent = Mechanize.new
