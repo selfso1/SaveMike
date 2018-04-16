@@ -15,6 +15,10 @@ class MechanizeMike
     @msg = ""
   end
 
+  def msg
+    @msg
+  end
+
   def default_user
     'rfinnigan'
   end
@@ -31,6 +35,7 @@ class MechanizeMike
   # TODO validate if there is a splash page and submit answer
   # @return home_page
   def login email_val = nil, password_val = nil , provider = nil
+    
     email_val = email_val ? email_val : default_user
     password = password_val ? password_val : default_password
     provider = provider ? provider : default_provider
@@ -56,6 +61,7 @@ class MechanizeMike
   # 1st page of isp requires user to select date to submit
   # @return main isp_page
   def isp_date_page_submit date = nil
+
     date = date ? date : Time.now
     date_arg = date.strftime("%m/%d/%Y")
     #next if ["05/18/2016", "05/16/2016", "05/01/2016", "03/13/2016", "02/03/2016", "02/02/2016", "01/08/2016", "12/07/2015", "11/28/2015", "11/29/2015", "11/30/2015"].include? date_arg
@@ -76,7 +82,8 @@ class MechanizeMike
 
   # 2nd page of isp form
   # @return success page
-  def isp_form_page_submit isp_page, date
+  def isp_form_page_submit isp_page, date = nil
+
     isp_form = isp_page.form
 
     location_field = isp_form.field_with(name: 'ispData.location')
@@ -107,16 +114,18 @@ class MechanizeMike
   end
 
   def splash_page_submit home_page
+
     form = home_page.form(name: "splash")
-    marked_read_field = form.checkbox_with(name: 'markedRead')
-    marked_read_field.value = "checked"
+    marked_read_field = form.checkbox_with(name: 'markedRead').check    
     form.field_with(name: "actionButton").value = "firstPage"
+
     dashboard_page = form.submit
     dashboard_page
 
   end
 
   def get_splash_message home_page
+
     form = home_page.form(name: "splash")
     current_message_id = form.field_with(name: 'currentMessageId').value
     splash_msg_page = @agent.get "#@website/ma/splash/messageView?messageId=#{current_message_id}"
@@ -125,13 +134,14 @@ class MechanizeMike
   end
 
   def iterate_dates date_vals = {}
+
     start_year = date_vals.fetch(:start_year) { Time.now.year }
     start_month = date_vals.fetch(:start_month) { Time.now.month }
     start_day = date_vals.fetch(:start_day) { Time.now.day }
     end_year = date_vals.fetch(:end_year) { Time.now.year }
     end_month = date_vals.fetch(:end_month) { Time.now.month }
     end_day = date_vals.fetch(:end_day) { Time.now.day }
-
+    
     (Date.new(start_year.to_i, start_month, start_day)..Date.new(end_year, end_month, end_day)).each do |date|
       isp_page = isp_date_page_submit date      
       success_page = isp_form_page_submit isp_page, date
@@ -140,6 +150,7 @@ class MechanizeMike
   end
 
   def get_file_val file_type
+
     file_url = "../../"
 
     case file_type
