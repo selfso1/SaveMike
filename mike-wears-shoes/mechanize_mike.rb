@@ -1,6 +1,6 @@
 require 'mechanize'
 # additionally we can use logger to log mechanize actions
-require 'logger'
+# require 'logger'
 require 'date'
 require 'pry'
 
@@ -135,14 +135,14 @@ class MechanizeMike
 
   def iterate_dates date_vals = {}
 
-    start_year = date_vals.fetch(:start_year) { Time.now.year }
-    start_month = date_vals.fetch(:start_month) { Time.now.month }
-    start_day = date_vals.fetch(:start_day) { Time.now.day }
-    end_year = date_vals.fetch(:end_year) { Time.now.year }
-    end_month = date_vals.fetch(:end_month) { Time.now.month }
-    end_day = date_vals.fetch(:end_day) { Time.now.day }
+    start_year = date_vals.fetch(:start_year) || Time.now.year 
+    start_month = date_vals.fetch(:start_month) || Time.now.month 
+    start_day = date_vals.fetch(:start_day) || Time.now.day 
+    end_year = date_vals.fetch(:end_year) || Time.now.year 
+    end_month = date_vals.fetch(:end_month) || Time.now.month 
+    end_day = date_vals.fetch(:end_day) || Time.now.day 
     
-    (Date.new(start_year.to_i, start_month, start_day)..Date.new(end_year, end_month, end_day)).each do |date|
+    (Date.new(start_year, start_month, start_day)..Date.new(end_year, end_month, end_day)).each do |date|
       isp_page = isp_date_page_submit date      
       success_page = isp_form_page_submit isp_page, date
     end
@@ -151,8 +151,12 @@ class MechanizeMike
 
   def get_file_val file_type
 
+    # Mac and Linux only
     file_url = "../../"
-
+    # Windows 
+    # file_url = "C:\\MechanizeMike"
+    # Dir.mkdir(file_url) unless File.exists?(file_url)
+    
     case file_type
     when "activity1"
       file_name = "Activities1.txt"
