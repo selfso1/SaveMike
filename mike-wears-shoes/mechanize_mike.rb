@@ -1,6 +1,6 @@
 require 'mechanize'
 # additionally we can use logger to log mechanize actions
-# require 'logger'
+require 'logger'
 require 'date'
 require 'pry'
 
@@ -11,7 +11,7 @@ class MechanizeMike
   def initialize 
     @website = 'https://secure.therapservices.net'
     @agent = Mechanize.new
-    # @agent.log = Logger.new "mechanize.log"
+    @logger = Logger.new "mechanize.log"
     @msg = ""
   end
 
@@ -103,12 +103,13 @@ class MechanizeMike
   
     date = date ? date : Time.now
     date_arg = date.strftime("%m/%d/%Y")
+
     if submitpage.uri.to_s.include?("https://secure.therapservices.net/ma/common/done")
       @msg << "#{date_arg} processed. "
     else
       @msg << "#{date_arg} SOMETHING WENT WRONG! "
     end
-
+    @logger.info(@msg)
     submitpage
 
   end
@@ -143,8 +144,12 @@ class MechanizeMike
     end_day = date_vals.fetch(:end_day) || Time.now.day 
     
     (Date.new(start_year, start_month, start_day)..Date.new(end_year, end_month, end_day)).each do |date|
+      
       isp_page = isp_date_page_submit date      
       success_page = isp_form_page_submit isp_page, date
+      
+      sleep 10            
+
     end
 
   end

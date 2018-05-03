@@ -17,7 +17,7 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 650) do
   stack margin: 10 do
     
     @title = stack do
-      title "Let's Mechanize Mike!", left: 50
+      title "Mechanize Mike", left: 50
     end
     @image_stack = stack do
       image img1, left: 100      
@@ -68,7 +68,7 @@ Shoes.app(title: "Mike Wears Shoes", width: 454, height: 650) do
         # Success, time to get down
         @title.clear do 
           stack do 
-            title "Ready To Automate", left: 55 
+            title "Ready To Mechanize", left: 55 
           end
         end
         @image_stack.clear do 
