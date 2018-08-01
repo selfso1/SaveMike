@@ -67,7 +67,7 @@ class MechanizeMike
     #next if ["05/18/2016", "05/16/2016", "05/01/2016", "03/13/2016", "02/03/2016", "02/02/2016", "01/08/2016", "12/07/2015", "11/28/2015", "11/29/2015", "11/30/2015"].include? date_arg
     #isp_choose  = agent.get "#@website/ma/isp/individualListData?pgmId=98291&backLink=%2fnewfpage%2fswitchFirstPage&backType=1"
     #isp_choose  = agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-EAL4QAEVV7677&backLink=%2Fnewfpage%2FswitchFirstPage&backType=2"
-    isp_choose  = @agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-FAQ4V2RVXPKT3&backLink=ispDataList"
+    isp_choose  = @agent.get "#@website/ma/isp/dateSelect?formId=ISP-CCICO-G8W4PVTZGFMNR&backLink=ispDataList"
     
     date_form = isp_choose.form
     
