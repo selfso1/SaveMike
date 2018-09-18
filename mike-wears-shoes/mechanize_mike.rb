@@ -154,6 +154,26 @@ class MechanizeMike
 
   end
 
+  def run_isp date = nil
+    home_page = login default_user, "#{default_password}", default_provider
+
+    if is_unsuccessful_login? home_page
+	@logger.info("Unsuccessful login.")
+    else
+
+	@logger.info("Successful login. roceeding to date page")
+    end
+   
+    if is_splash_page? home_page
+        splash_msg_page = get_splash_message home_page
+	@logger.info("Splash Page #{splash_msg_page.at_css("#message").text}")
+	home_page_new = splash_page_submit home_page
+    else
+	isp_page = isp_date_page_submit date	
+	success_page = isp_form_page_submit isp_page, date
+	@logger.info("One Day Yep yep, \n #{self.msg}. ")
+    end
+  end
   def get_file_val file_type
 
     # Mac and Linux only
